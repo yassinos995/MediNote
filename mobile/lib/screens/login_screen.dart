@@ -3,6 +3,9 @@ import 'delegate/delegate_dashboard.dart';
 import 'enterprise/enterprise_dashboard.dart';
 import 'admin/admin_dashboard.dart'; // ✅ AJOUTER
 import '../models/user_model.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -16,6 +19,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   bool _isLoading = false;
   bool _obscurePassword = true;
+  static const String _baseUrl = "http://10.0.2.2:8081";
+  final _storage = const FlutterSecureStorage();
 
   UserRole _selectedRole = UserRole.delegate;
 
@@ -62,8 +67,11 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  void _handleLogin() {
-    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+  Future<void> _handleLogin() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+
+    if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill in all fields')),
       );
@@ -72,44 +80,86 @@ class _LoginScreenState extends State<LoginScreen> {
 
     setState(() => _isLoading = true);
 
-    Future.delayed(const Duration(seconds: 2), () {
+    try {
+      final uri = Uri.parse("$_baseUrl/api/auth/login");
+
+      final res = await http.post(
+        uri,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"email": email, "password": password}),
+      );
+
+      if (res.statusCode != 200) {
+        // Ton SecurityConfig renvoie 401 JSON, donc on affiche juste un message propre
+        throw Exception("Invalid email or password");
+      }
+
+      final data = jsonDecode(res.body) as Map<String, dynamic>;
+      final token = data["accessToken"] as String?;
+      final role = (data["role"] as String?)?.toUpperCase(); // "ADMIN" ...
+      final mail = data["email"] as String?;
+
+      if (token == null || role == null || mail == null) {
+        throw Exception("Bad server response");
+      }
+
+      // Stockage sécurisé
+      await _storage.write(key: "accessToken", value: token);
+      await _storage.write(key: "role", value: role);
+      await _storage.write(key: "email", value: mail);
+
       if (!mounted) return;
       setState(() => _isLoading = false);
 
+      // Convertir role backend -> UserRole flutter
+      final UserRole userRole;
+      if (role == "DELEGATE") {
+        userRole = UserRole.delegate;
+      } else if (role == "STAFF") {
+        userRole = UserRole.enterprise;
+      } else if (role == "ADMIN") {
+        userRole = UserRole.admin;
+      } else {
+        throw Exception("Unknown role: $role");
+      }
+
       final user = User(
         id: '1',
-        email: _emailController.text.trim(),
-        name: _selectedRole == UserRole.delegate
+        email: mail,
+        name: userRole == UserRole.delegate
             ? 'Dr. John Smith'
-            : _selectedRole == UserRole.enterprise
-            ? 'Enterprise Manager'
+            : userRole == UserRole.enterprise
+            ? 'Staff User'
             : 'Admin PharmaCare',
-        // ✅ IMPORTANT: role doit rester minuscule si tu l’utilises dans filtres
-        role: _roleString(_selectedRole),
-        userRole: _selectedRole,
+        role: role.toLowerCase(), // si tu utilises minuscule dans l'app
+        userRole: userRole,
         company: 'PharmaCare Inc.',
-        phone: _selectedRole == UserRole.delegate ? '+33 6 12 34 56 78' : null,
-        region: _selectedRole == UserRole.delegate ? 'Île-de-France' : null,
+        phone: userRole == UserRole.delegate ? '+33 6 12 34 56 78' : null,
+        region: userRole == UserRole.delegate ? 'Île-de-France' : null,
       );
 
-      if (_selectedRole == UserRole.delegate) {
+      // Navigation selon role backend
+      if (userRole == UserRole.delegate) {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => DelegateDashboard(user: user),
-          ),
+          MaterialPageRoute(builder: (_) => DelegateDashboard(user: user)),
         );
-      } else if (_selectedRole == UserRole.enterprise) {
+      } else if (userRole == UserRole.enterprise) {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => EnterpriseDashboard(user: user),
-          ),
+          MaterialPageRoute(builder: (_) => EnterpriseDashboard(user: user)),
         );
       } else {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => AdminDashboard(admin: user)),
+          MaterialPageRoute(builder: (_) => AdminDashboard(admin: user)),
         );
       }
-    });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Login failed: ${e.toString()}")));
+    }
   }
 
   Widget _roleButton(UserRole role) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'screens/login_screen.dart';
 
+
 void main() {
   runApp(const PharmaApp());
 }
@@ -26,6 +27,7 @@ class PharmaApp extends StatelessWidget {
           elevation: 0,
         ),
       ),
+      // home: const HealthTestScreen(),
       home: const LoginScreen(),
       debugShowCheckedModeBanner: false,
     );
