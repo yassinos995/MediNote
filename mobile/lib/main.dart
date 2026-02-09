@@ -26,6 +26,7 @@ class PharmaApp extends StatelessWidget {
           elevation: 0,
         ),
       ),
+
       home: const LoginScreen(),
       debugShowCheckedModeBanner: false,
     );
