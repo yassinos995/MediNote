@@ -13,7 +13,7 @@ public class DataSeeder {
     @Bean
     CommandLineRunner seedAdmin(UserRepository repo, PasswordEncoder encoder) {
         return args -> {
-            String email = "admin@medinote.com";
+            String email = "admin2@medinote.com";
 
             if (!repo.existsByEmail(email)) {
                 repo.save(User.builder()
