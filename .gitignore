@@ -1,0 +1,30 @@
+# IntelliJ / JetBrains
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Maven
+**/target/
+**/.mvn/wrapper/maven-wrapper.jar
+
+# Gradle / Flutter / Android Studio
+**/.gradle/
+**/build/
+**/.dart_tool/
+**/.metadata
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+
+# VS Code
+.vscode/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Your local folders (example)
+backend/TP-Foyer-4DS4/
+backend/HELP.md
+backend/target/
+backend/.idea/
