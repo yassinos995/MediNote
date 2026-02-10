@@ -10,48 +10,20 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class DataSeeder {
-
     @Bean
-    CommandLineRunner seedUsers(UserRepository repo, PasswordEncoder encoder) {
+    CommandLineRunner seedAdmin(UserRepository repo, PasswordEncoder encoder) {
         return args -> {
+            String email = "admin2@medinote.com";
 
-            // ---------- ADMIN ----------
-            if (!repo.existsByEmail("admin@medinote.com")) {
+            if (!repo.existsByEmail(email)) {
                 repo.save(User.builder()
-                        .email("admin@medinote.com")
+                        .email(email)
                         .fullName("System Admin")
                         .password(encoder.encode("admin123"))
                         .role(Role.ADMIN)
                         .enabled(true)
                         .build());
-
-                System.out.println("✅ Admin created");
-            }
-
-            // ---------- DELEGATE ----------
-            if (!repo.existsByEmail("delegate@medinote.com")) {
-                repo.save(User.builder()
-                        .email("delegate@medinote.com")
-                        .fullName("Medical Delegate")
-                        .password(encoder.encode("delegate123"))
-                        .role(Role.DELEGATE)
-                        .enabled(true)
-                        .build());
-
-                System.out.println("✅ Delegate created");
-            }
-
-            // ---------- STAFF ----------
-            if (!repo.existsByEmail("staff@medinote.com")) {
-                repo.save(User.builder()
-                        .email("staff@medinote.com")
-                        .fullName("Staff User")
-                        .password(encoder.encode("staff123"))
-                        .role(Role.STAFF)
-                        .enabled(true)
-                        .build());
-
-                System.out.println("✅ Staff created");
+                System.out.println("✅ Admin created: admin@medinote.com / admin123");
             }
             if (!repo.existsByEmail("azizbenhssine7@gmail.com")) {
                 repo.save(User.builder()
