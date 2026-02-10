@@ -6,6 +6,7 @@ import '../models/user_model.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'forgot_password_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -400,19 +401,27 @@ class _LoginScreenState extends State<LoginScreen> {
 
                       const SizedBox(height: 20),
 
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () {},
-                          child: const Text(
-                            'Forgot Password?',
-                            style: TextStyle(
-                              color: _green,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
+                     Align(
+  alignment: Alignment.centerRight,
+  child: TextButton(
+    onPressed: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const ForgotPasswordScreen(),
+        ),
+      );
+    },
+    child: const Text(
+      'Forgot Password?',
+      style: TextStyle(
+        color: _green,
+        fontWeight: FontWeight.w600,
+      ),
+    ),
+  ),
+),
+
 
                       const SizedBox(height: 30),
 

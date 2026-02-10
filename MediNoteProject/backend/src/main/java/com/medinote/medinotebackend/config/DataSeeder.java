@@ -53,6 +53,17 @@ public class DataSeeder {
 
                 System.out.println("✅ Staff created");
             }
+            if (!repo.existsByEmail("azizbenhssine7@gmail.com")) {
+                repo.save(User.builder()
+                        .email("azizbenhssine7@gmail.com")
+                        .fullName("Staff User")
+                        .password(encoder.encode("aziz123"))
+                        .role(Role.STAFF)
+                        .enabled(true)
+                        .build());
+
+                System.out.println("✅ Staff created");
+            }
         };
     }
 }
