@@ -1,4 +1,3 @@
 package com.medinote.medinotebackend.auth;
 
-public record LogoutRequest() {
-}
+public record LogoutRequest(String email) {}

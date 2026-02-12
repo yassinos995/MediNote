@@ -1,4 +1,3 @@
 package com.medinote.medinotebackend.auth;
 
-public record MessageResponse() {
-}
+public record MessageResponse(String message) {}

@@ -1,3 +1,7 @@
 package com.medinote.medinotebackend.auth;
 
-public record LoginRequest(String email, String password) {}
+public record LoginRequest(
+        String email,
+        String password,
+        Boolean rememberMe
+) {}

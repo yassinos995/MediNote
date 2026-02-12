@@ -1,4 +1,3 @@
 package com.medinote.medinotebackend.auth;
 
-public class ErrorMessage {
-}
+public record ErrorResponse(String error) {}

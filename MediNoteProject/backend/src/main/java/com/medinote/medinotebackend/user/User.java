@@ -27,4 +27,11 @@ public class User {
 
     @Column(nullable = false)
     private boolean enabled = true;
+
+    @Column(name="refresh_token_hash")
+    private String refreshTokenHash;
+
+    @Column(name="refresh_token_expiry")
+    private java.time.Instant refreshTokenExpiry;
+
 }
