@@ -23,31 +23,40 @@ public class SecurityConfig {
     @Order(1)
     public SecurityFilterChain apiChain(HttpSecurity http) throws Exception {
         return http
-                // cette chain ne s'applique QUE sur /api/**
                 .securityMatcher("/api/**")
+
+                // si tu as un front (Flutter Web / navigateur), active CORS
+                .cors(cors -> {})
+
                 .csrf(csrf -> csrf.disable())
                 .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable())
+
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
                 .authorizeHttpRequests(auth -> auth
-                        // public
                         .requestMatchers(
                                 "/api/auth/login",
                                 "/api/auth/refresh",
                                 "/api/auth/forgot-password",
+                                "/api/auth/reset-password",
                                 "/api/auth/logout",
-                                "/reset-password",
-                                "/api/auth/reset-password"
+                                "/reset-password"
+                                // "/api/auth/register"  // ajoute si tu as register
+                                // "/actuator/health"    // ajoute si tu utilises actuator
                         ).permitAll()
-                        // tout le reste protégé
+                        .requestMatchers("/api/users/**").hasRole("ADMIN")
+
                         .anyRequest().authenticated()
                 )
+
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
-
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
+
+
 }
