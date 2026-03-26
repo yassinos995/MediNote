@@ -41,13 +41,14 @@ public class SecurityConfig {
                                 "/api/auth/forgot-password",
                                 "/api/auth/reset-password",
                                 "/api/auth/logout",
-                                "/reset-password"
+                                "/reset-password",
+                                "/api/data/**"
                                 // "/api/auth/register"  // ajoute si tu as register
                                 // "/actuator/health"    // ajoute si tu utilises actuator
                         ).permitAll()
                         .requestMatchers("/api/users/**").hasRole("ADMIN")
 
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
 
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
