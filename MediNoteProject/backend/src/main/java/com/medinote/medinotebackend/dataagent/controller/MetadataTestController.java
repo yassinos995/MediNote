@@ -32,23 +32,7 @@ public class MetadataTestController {
             throw new IllegalArgumentException("Nom de table invalide : " + tableName);
         }
 
-        String role = (authentication == null || !authentication.isAuthenticated()
-                || authentication.getAuthorities() == null
-                || authentication.getAuthorities().isEmpty())
-                ? "ADMIN"
-                : authentication.getAuthorities().stream()
-                        .findFirst()
-                        .map(a -> a.getAuthority().replace("ROLE_", "").toUpperCase())
-                        .orElse("ADMIN");
-
-        // ── PRODUCTION: uncomment below, remove the block above ──
-//        if (authentication == null || !authentication.isAuthenticated()) {
-//            throw new SecurityException("Utilisateur non authentifié");
-//        }
-//        String role = authentication.getAuthorities().stream()
-//                .findFirst()
-//                .map(a -> a.getAuthority().replace("ROLE_", "").toUpperCase())
-//                .orElseThrow(() -> new SecurityException("Aucun rôle trouvé"));
+        String role = extractRole(authentication);
 
         if (!accessPolicyService.canReadTable(role, tableName.toLowerCase())) {
             throw new SecurityException("Accès refusé à la table : " + tableName);
@@ -67,5 +51,17 @@ public class MetadataTestController {
         return all.stream()
                 .filter(c -> allowed.contains(c.getName()) && !excluded.contains(c.getName()))
                 .toList();
+    }
+
+    private String extractRole(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()
+                || authentication.getAuthorities() == null
+                || authentication.getAuthorities().isEmpty()) {
+            throw new SecurityException("Utilisateur non authentifie");
+        }
+        return authentication.getAuthorities().stream()
+                .findFirst()
+                .map(a -> a.getAuthority().replace("ROLE_", "").toUpperCase())
+                .orElseThrow(() -> new SecurityException("Aucun role trouve"));
     }
 }

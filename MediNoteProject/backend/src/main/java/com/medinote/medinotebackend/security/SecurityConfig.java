@@ -30,22 +30,20 @@ public class SecurityConfig {
                 .httpBasic(basic -> basic.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // ── TESTING MODE: all requests permitted, no auth required ──
-                        .anyRequest().permitAll()
-
-                        // ── PRODUCTION: uncomment below, remove permitAll above ──
-//                        .requestMatchers(
-//                                "/api/auth/login",
-//                                "/api/auth/refresh",
-//                                "/api/auth/forgot-password",
-//                                "/api/auth/reset-password",
-//                                "/api/auth/logout",
-//                                "/reset-password"
-//                        ).permitAll()
-//                        .requestMatchers("/api/users/**").hasRole("ADMIN")
-//                        .anyRequest().authenticated()
+                        .requestMatchers(
+                                "/api/auth/login",
+                                "/api/auth/refresh",
+                                "/api/auth/forgot-password",
+                                "/api/auth/reset-password",
+                                "/api/auth/logout",
+                                "/reset-password"
+                        ).permitAll()
+                        .requestMatchers("/api/users/**").hasRole("ADMIN")
+                        .requestMatchers("/api/scoring/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/notifications/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated()
                 )
-//                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 

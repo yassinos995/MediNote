@@ -185,18 +185,10 @@ public class GenericDataController {
     // ── Private ───────────────────────────────────────────────────────────────
 
     private String extractRole(Authentication authentication) {
-        // ── TESTING MODE: no auth required, default to ADMIN ──
         if (authentication == null || authentication.getAuthorities() == null
                 || authentication.getAuthorities().isEmpty()) {
-            return "ADMIN";
+            throw new SecurityException("Utilisateur non authentifié");
         }
-
-        // ── PRODUCTION: uncomment below, remove the return above ──
-//        if (authentication == null || authentication.getAuthorities() == null
-//                || authentication.getAuthorities().isEmpty()) {
-//            throw new SecurityException("Utilisateur non authentifié");
-//        }
-
         return authentication.getAuthorities().stream()
                 .findFirst()
                 .orElseThrow(() -> new SecurityException("Aucun rôle trouvé"))

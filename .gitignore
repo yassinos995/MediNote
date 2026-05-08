@@ -23,6 +23,11 @@
 .DS_Store
 Thumbs.db
 
+# Local tool files and logs
+.claude/
+logs/
+*.log
+
 # Your local folders (example)
 backend/TP-Foyer-4DS4/
 backend/HELP.md
