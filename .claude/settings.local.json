@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find '/c/backend PI/MediNote/MediNoteProject' -type d -not -path *target* -not -path *.git* -not -path *.idea*)",
+      "Bash(python3 -c \":*)",
+      "Bash(curl:*)"
+    ]
+  }
+}

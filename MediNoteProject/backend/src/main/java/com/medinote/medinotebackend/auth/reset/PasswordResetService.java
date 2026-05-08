@@ -12,7 +12,6 @@ import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Base64;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class PasswordResetService {

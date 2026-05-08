@@ -3,6 +3,7 @@ package com.medinote.medinotebackend.config;
 import com.medinote.medinotebackend.user.Role;
 import com.medinote.medinotebackend.user.User;
 import com.medinote.medinotebackend.user.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,32 +11,49 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class DataSeeder {
+
     @Bean
-    CommandLineRunner seedAdmin(UserRepository repo, PasswordEncoder encoder) {
+    CommandLineRunner seedUsers(
+            UserRepository repo,
+            PasswordEncoder encoder,
+            @Value("${app.seed.enabled:false}") boolean seedEnabled,
+            @Value("${app.seed.admin.email:}") String adminEmail,
+            @Value("${app.seed.admin.password:}") String adminPassword,
+            @Value("${app.seed.staff.email:}") String staffEmail,
+            @Value("${app.seed.staff.password:}") String staffPassword
+    ) {
         return args -> {
-            String email = "admin2@medinote.com";
-
-            if (!repo.existsByEmail(email)) {
-                repo.save(User.builder()
-                        .email(email)
-                        .fullName("System Admin")
-                        .password(encoder.encode("admin123"))
-                        .role(Role.ADMIN)
-                        .enabled(true)
-                        .build());
-                System.out.println("✅ Admin created: admin@medinote.com / admin123");
+            if (!seedEnabled) {
+                return;
             }
-            if (!repo.existsByEmail("azizbenhssine7@gmail.com")) {
-                repo.save(User.builder()
-                        .email("azizbenhssine7@gmail.com")
-                        .fullName("Staff User")
-                        .password(encoder.encode("aziz123"))
-                        .role(Role.STAFF)
-                        .enabled(true)
-                        .build());
 
-                System.out.println("✅ Staff created");
-            }
+            seedUser(repo, encoder, adminEmail, adminPassword, "System Admin", Role.ADMIN);
+            seedUser(repo, encoder, staffEmail, staffPassword, "Staff User", Role.STAFF);
         };
+    }
+
+    private void seedUser(
+            UserRepository repo,
+            PasswordEncoder encoder,
+            String email,
+            String password,
+            String fullName,
+            Role role
+    ) {
+        if (email == null || email.isBlank() || password == null || password.isBlank()) {
+            return;
+        }
+
+        String normalizedEmail = email.trim();
+        if (!repo.existsByEmail(normalizedEmail)) {
+            repo.save(User.builder()
+                    .email(normalizedEmail)
+                    .fullName(fullName)
+                    .password(encoder.encode(password))
+                    .role(role)
+                    .enabled(true)
+                    .build());
+            System.out.println("Seeded " + role + " user: " + normalizedEmail);
+        }
     }
 }
